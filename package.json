@@ -1,0 +1,24 @@
+{
+  "name": "sibyl",
+  "version": "0.0.1",
+  "description": "Claude Code package manager for skills, agents, and commands",
+  "type": "module",
+  "bin": {
+    "sibyl": "./dist/bin/sibyl.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.12.2",
+  "dependencies": {
+    "commander": "^13.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
