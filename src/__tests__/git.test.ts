@@ -15,7 +15,7 @@ beforeEach(async () => {
   bareRepo = await mkdtemp(join(tmpdir(), "sibyl-bare-"));
   const workDir = await mkdtemp(join(tmpdir(), "sibyl-work-"));
 
-  await execFileAsync("git", ["init", workDir]);
+  await execFileAsync("git", ["init", "-b", "main", workDir]);
   await execFileAsync("git", ["-C", workDir, "config", "user.email", "test@test.com"]);
   await execFileAsync("git", ["-C", workDir, "config", "user.name", "Test"]);
 
