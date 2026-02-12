@@ -1,0 +1,22 @@
+{
+  "packages": {
+    "affaan-m/everything-claude-code/skills/tdd-workflow": {
+      "type": "skill",
+      "org": "affaan-m",
+      "repo": "everything-claude-code",
+      "path": "skills/tdd-workflow",
+      "ref": "main",
+      "commit": "18c5a76a96901e169027a762186121f96694ae0e",
+      "name": "tdd-workflow"
+    },
+    "affaan-m/everything-claude-code/commands/multi-plan.md": {
+      "type": "command",
+      "org": "affaan-m",
+      "repo": "everything-claude-code",
+      "path": "commands/multi-plan.md",
+      "ref": "main",
+      "commit": "18c5a76a96901e169027a762186121f96694ae0e",
+      "name": "multi-plan"
+    }
+  }
+}
