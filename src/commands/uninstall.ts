@@ -1,6 +1,7 @@
 import { unlinkPackage } from "../linker.js";
 import { findEntries, readLock, removeEntry } from "../lockfile.js";
 import type { PackageType } from "../lockfile.js";
+import { fail, pkgName, success, typeBadge } from "../log.js";
 import { removeFromStore, storePath } from "../store.js";
 
 /**
@@ -11,7 +12,7 @@ export async function uninstall(type: PackageType, name: string, root: string): 
   const matches = findEntries(lock, { type, name });
 
   if (matches.length === 0) {
-    console.log(`No ${type} named "${name}" found.`);
+    fail(`No ${typeBadge(type)} named ${pkgName(name)} found`);
     return;
   }
 
@@ -32,6 +33,6 @@ export async function uninstall(type: PackageType, name: string, root: string): 
     });
     await removeEntry(root, key);
 
-    console.log(`Uninstalled ${type} "${entry.name}"`);
+    success(`Removed ${typeBadge(type)} ${pkgName(entry.name)}`);
   }
 }

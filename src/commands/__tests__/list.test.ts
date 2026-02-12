@@ -43,7 +43,8 @@ describe("list", () => {
   it("prints message when no packages installed", async () => {
     const spy = vi.spyOn(console, "log");
     await list(undefined, root);
-    expect(spy).toHaveBeenCalledWith("No packages installed.");
+    const output = spy.mock.calls.map((c) => c[0]).join("\n");
+    expect(output).toContain("No packages installed.");
     spy.mockRestore();
   });
 
@@ -51,7 +52,8 @@ describe("list", () => {
     await writeLock(root, baseLock);
     const spy = vi.spyOn(console, "log");
     await list("command", root);
-    expect(spy).toHaveBeenCalledWith("No commands installed.");
+    const output = spy.mock.calls.map((c) => c[0]).join("\n");
+    expect(output).toContain("No commands installed.");
     spy.mockRestore();
   });
 
@@ -61,8 +63,10 @@ describe("list", () => {
     await list(undefined, root);
 
     const output = spy.mock.calls.map((c) => c[0]).join("\n");
-    expect(output).toContain("lint-fix (skill)");
-    expect(output).toContain("reviewer (agent)");
+    expect(output).toContain("lint-fix");
+    expect(output).toContain("skill");
+    expect(output).toContain("reviewer");
+    expect(output).toContain("agent");
     spy.mockRestore();
   });
 
@@ -72,7 +76,8 @@ describe("list", () => {
     await list("skill", root);
 
     const output = spy.mock.calls.map((c) => c[0]).join("\n");
-    expect(output).toContain("lint-fix (skill)");
+    expect(output).toContain("lint-fix");
+    expect(output).toContain("skill");
     expect(output).not.toContain("reviewer");
     spy.mockRestore();
   });

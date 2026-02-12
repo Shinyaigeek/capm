@@ -37,7 +37,8 @@ describe("restore", () => {
   it("prints message when lockfile is empty", async () => {
     const spy = vi.spyOn(console, "log");
     await restore(root);
-    expect(spy).toHaveBeenCalledWith("No packages in lockfile.");
+    const output = spy.mock.calls.map((c) => c[0]).join("\n");
+    expect(output).toContain("No packages in lockfile.");
     spy.mockRestore();
   });
 

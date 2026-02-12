@@ -1,5 +1,6 @@
 import { findEntries, readLock } from "../lockfile.js";
 import type { PackageType } from "../lockfile.js";
+import { commitHash, header, item, pkgName, specRef, typeBadge, warn } from "../log.js";
 
 /**
  * List installed packages, optionally filtered by type.
@@ -9,17 +10,18 @@ export async function list(type: PackageType | undefined, root: string): Promise
   const entries = findEntries(lock, type ? { type } : {});
 
   if (entries.length === 0) {
-    console.log(type ? `No ${type}s installed.` : "No packages installed.");
+    warn(type ? `No ${type}s installed.` : "No packages installed.");
     return;
   }
 
   const label = type ? `${type}s` : "packages";
-  console.log(`Installed ${label}:\n`);
+  header(`${entries.length} ${label} installed`);
+  console.log();
 
   for (const [key, entry] of entries) {
-    const shortCommit = entry.commit.slice(0, 8);
-    console.log(`  ${entry.name} (${entry.type})`);
-    console.log(`    ${key}@${entry.ref} [${shortCommit}]`);
+    item(
+      `${pkgName(entry.name)} ${typeBadge(entry.type)}  ${specRef(key, entry.ref)}  ${commitHash(entry.commit)}`,
+    );
   }
 
   console.log();

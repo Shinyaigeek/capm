@@ -3,6 +3,18 @@ import { cloneAtCommit, shallowClone } from "../git.js";
 import { link } from "../linker.js";
 import { readLock } from "../lockfile.js";
 import type { LockEntry } from "../lockfile.js";
+import {
+  bold,
+  commitHash,
+  dim,
+  header,
+  item,
+  pkgName,
+  spinner,
+  success,
+  typeBadge,
+  warn,
+} from "../log.js";
 import { existsInStore, placeInStore, storePath } from "../store.js";
 
 interface GroupItem extends LockEntry {
@@ -26,11 +38,12 @@ export async function restore(root: string): Promise<void> {
   const entries = Object.entries(lock.packages);
 
   if (entries.length === 0) {
-    console.log("No packages in lockfile.");
+    warn("No packages in lockfile.");
     return;
   }
 
-  console.log(`Restoring ${entries.length} package(s)...\n`);
+  header(`Restoring ${bold(String(entries.length))} package(s)`);
+  console.log();
 
   // Group by org/repo/commit to clone once per unique combo
   const groups = new Map<string, CloneGroup>();
@@ -50,40 +63,47 @@ export async function restore(root: string): Promise<void> {
 
   for (const group of groups.values()) {
     const needsClone: GroupItem[] = [];
-    for (const item of group.items) {
+    for (const groupItem of group.items) {
       const exists = await existsInStore(root, {
-        org: item.org,
-        repo: item.repo,
-        commit: item.commit,
-        path: item.path,
+        org: groupItem.org,
+        repo: groupItem.repo,
+        commit: groupItem.commit,
+        path: groupItem.path,
       });
       if (!exists) {
-        needsClone.push(item);
+        needsClone.push(groupItem);
       }
     }
 
     let tmpDir: string | null = null;
 
     if (needsClone.length > 0) {
+      const repoLabel = dim(`${group.org}/${group.repo}`);
+      const s = spinner(`Fetching ${repoLabel} ${commitHash(group.commit)}`);
+
       try {
-        const result = await cloneAtCommit(group.org, group.repo, group.commit);
-        tmpDir = result.tmpDir;
-      } catch {
-        console.log(
-          `  Commit ${group.commit.slice(0, 8)} not fetchable, trying ref "${group.ref}"...`,
-        );
-        const result = await shallowClone(group.org, group.repo, group.ref);
-        tmpDir = result.tmpDir;
+        try {
+          const result = await cloneAtCommit(group.org, group.repo, group.commit);
+          tmpDir = result.tmpDir;
+        } catch {
+          s.update(`Fetching ${repoLabel}${dim("@")}${group.ref}`);
+          const result = await shallowClone(group.org, group.repo, group.ref);
+          tmpDir = result.tmpDir;
+        }
+        s.stop();
+      } catch (err) {
+        s.stop();
+        throw err;
       }
     }
 
     try {
-      for (const item of group.items) {
+      for (const groupItem of group.items) {
         const loc = {
-          org: item.org,
-          repo: item.repo,
-          commit: item.commit,
-          path: item.path,
+          org: groupItem.org,
+          repo: groupItem.repo,
+          commit: groupItem.commit,
+          path: groupItem.path,
         };
 
         const exists = await existsInStore(root, loc);
@@ -95,8 +115,8 @@ export async function restore(root: string): Promise<void> {
           dest = storePath(root, loc);
         }
 
-        await link(root, item.type, item.name, dest);
-        console.log(`  Restored ${item.type} "${item.name}"`);
+        await link(root, groupItem.type, groupItem.name, dest);
+        item(`${pkgName(groupItem.name)} ${typeBadge(groupItem.type)}`);
       }
     } finally {
       if (tmpDir) {
@@ -105,5 +125,6 @@ export async function restore(root: string): Promise<void> {
     }
   }
 
-  console.log(`\nRestored ${entries.length} package(s).`);
+  console.log();
+  success(`Restored ${bold(String(entries.length))} package(s)`);
 }

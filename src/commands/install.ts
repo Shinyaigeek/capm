@@ -3,6 +3,7 @@ import { shallowClone } from "../git.js";
 import { link } from "../linker.js";
 import { addEntry } from "../lockfile.js";
 import type { PackageType } from "../lockfile.js";
+import { SYMBOLS, commitHash, dim, green, pkgName, specRef, spinner, typeBadge } from "../log.js";
 import { nameFromSpec, parseSpec, specKey } from "../spec.js";
 import { placeInStore } from "../store.js";
 
@@ -14,32 +15,43 @@ export async function install(type: PackageType, raw: string, root: string): Pro
   const name = nameFromSpec(spec);
   const key = specKey(spec);
 
-  console.log(`Installing ${type} "${name}" from ${key}@${spec.ref}...`);
-
-  const { tmpDir, commit } = await shallowClone(spec.org, spec.repo, spec.ref);
+  const s = spinner(`Cloning ${dim(`${spec.org}/${spec.repo}`)}${dim("@")}${spec.ref}`);
 
   try {
-    const dest = await placeInStore(
-      root,
-      { org: spec.org, repo: spec.repo, commit, path: spec.path },
-      tmpDir,
-    );
+    const { tmpDir, commit } = await shallowClone(spec.org, spec.repo, spec.ref);
 
-    await link(root, type, name, dest);
+    try {
+      s.update(`Copying ${pkgName(name)} to store`);
 
-    await addEntry(root, {
-      key,
-      type,
-      org: spec.org,
-      repo: spec.repo,
-      path: spec.path,
-      ref: spec.ref,
-      commit,
-      name,
-    });
+      const dest = await placeInStore(
+        root,
+        { org: spec.org, repo: spec.repo, commit, path: spec.path },
+        tmpDir,
+      );
 
-    console.log(`Installed ${type} "${name}" (${commit.slice(0, 8)})`);
-  } finally {
-    await rm(tmpDir, { recursive: true, force: true });
+      s.update(`Linking ${pkgName(name)}`);
+
+      await link(root, type, name, dest);
+
+      await addEntry(root, {
+        key,
+        type,
+        org: spec.org,
+        repo: spec.repo,
+        path: spec.path,
+        ref: spec.ref,
+        commit,
+        name,
+      });
+
+      s.stop(
+        `${green(SYMBOLS.ok)} Installed ${typeBadge(type)} ${pkgName(name)} ${commitHash(commit)}  ${specRef(key, spec.ref)}`,
+      );
+    } finally {
+      await rm(tmpDir, { recursive: true, force: true });
+    }
+  } catch (err) {
+    s.stop();
+    throw err;
   }
 }

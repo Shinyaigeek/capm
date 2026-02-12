@@ -120,7 +120,9 @@ describe("uninstall", () => {
   it("logs message for non-existent package", async () => {
     const spy = vi.spyOn(console, "log");
     await uninstall("skill", "nonexistent", root);
-    expect(spy).toHaveBeenCalledWith('No skill named "nonexistent" found.');
+    const output = spy.mock.calls.map((c) => c[0]).join("\n");
+    expect(output).toContain("nonexistent");
+    expect(output).toContain("found");
     spy.mockRestore();
   });
 });
