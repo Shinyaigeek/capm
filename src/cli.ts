@@ -3,6 +3,7 @@ import { install } from "./commands/install.js";
 import { list } from "./commands/list.js";
 import { restore } from "./commands/restore.js";
 import { uninstall } from "./commands/uninstall.js";
+import { update } from "./commands/update.js";
 import type { PackageType } from "./lockfile.js";
 
 export function createCli(): Command {
@@ -19,6 +20,12 @@ export function createCli(): Command {
     .command("i")
     .description("Restore all packages from sibyl-lock.json")
     .action(() => restore(root));
+
+  // sibyl update [filter] — update all packages (or filtered by org/repo)
+  program
+    .command("update [filter]")
+    .description("Update all packages (or filter by <org>/<repo>)")
+    .action((filter?: string) => update(undefined, filter, root));
 
   // Helper to create type-specific subcommands (skill, agent, command)
   function registerTypeCommand(type: PackageType): void {
@@ -38,6 +45,11 @@ export function createCli(): Command {
       .command("rm <name>")
       .description(`Uninstall a ${type} by name`)
       .action((name: string) => uninstall(type, name, root));
+
+    cmd
+      .command("update [filter]")
+      .description(`Update ${type}s (optionally filter by <org>/<repo> or <org>/<repo>/<path>)`)
+      .action((filter?: string) => update(type, filter, root));
   }
 
   registerTypeCommand("skill");
