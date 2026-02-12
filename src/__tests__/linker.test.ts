@@ -125,3 +125,86 @@ describe("unlinkPackage", () => {
     await expect(unlinkPackage(root, "skill", "nonexistent", "/fake/path")).resolves.not.toThrow();
   });
 });
+
+describe("gitignore management", () => {
+  it("creates .gitignore in .claude/skills/ when linking a skill", async () => {
+    const storeDir = join(root, ".sibyl/store/acme/tools/abc123/skills/lint-fix");
+    await mkdir(storeDir, { recursive: true });
+    await writeFile(join(storeDir, "prompt.md"), "content");
+
+    await link(root, "skill", "lint-fix", storeDir);
+
+    const gitignore = await readFile(join(root, ".claude/skills/.gitignore"), "utf8");
+    expect(gitignore).toContain("# managed by sibyl");
+    expect(gitignore).toContain("lint-fix");
+  });
+
+  it("adds multiple entries sorted", async () => {
+    const storeA = join(root, ".sibyl/store/acme/tools/abc123/skills/zzz");
+    const storeB = join(root, ".sibyl/store/acme/tools/abc123/skills/aaa");
+    await mkdir(storeA, { recursive: true });
+    await mkdir(storeB, { recursive: true });
+
+    await link(root, "skill", "zzz", storeA);
+    await link(root, "skill", "aaa", storeB);
+
+    const gitignore = await readFile(join(root, ".claude/skills/.gitignore"), "utf8");
+    const lines = gitignore.split("\n");
+    const headerIdx = lines.findIndex((l) => l.includes("managed by sibyl"));
+    expect(lines[headerIdx + 1]).toBe("aaa");
+    expect(lines[headerIdx + 2]).toBe("zzz");
+  });
+
+  it("removes entry from .gitignore on unlink", async () => {
+    const storeA = join(root, ".sibyl/store/acme/tools/abc123/skills/a");
+    const storeB = join(root, ".sibyl/store/acme/tools/abc123/skills/b");
+    await mkdir(storeA, { recursive: true });
+    await mkdir(storeB, { recursive: true });
+
+    await link(root, "skill", "a", storeA);
+    await link(root, "skill", "b", storeB);
+    await unlinkPackage(root, "skill", "a", storeA);
+
+    const gitignore = await readFile(join(root, ".claude/skills/.gitignore"), "utf8");
+    expect(gitignore).not.toContain("\na\n");
+    expect(gitignore).toContain("b");
+  });
+
+  it("removes .gitignore when last entry is unlinked", async () => {
+    const storeDir = join(root, ".sibyl/store/acme/tools/abc123/skills/only");
+    await mkdir(storeDir, { recursive: true });
+
+    await link(root, "skill", "only", storeDir);
+    await unlinkPackage(root, "skill", "only", storeDir);
+
+    await expect(lstat(join(root, ".claude/skills/.gitignore"))).rejects.toThrow();
+  });
+
+  it("adds .md filenames for agent/command", async () => {
+    const storeDir = join(root, ".sibyl/store/acme/tools/abc123/agents/review");
+    await mkdir(storeDir, { recursive: true });
+    await writeFile(join(storeDir, "review.md"), "content");
+
+    await link(root, "agent", "review", storeDir);
+
+    const gitignore = await readFile(join(root, ".claude/agents/.gitignore"), "utf8");
+    expect(gitignore).toContain("review.md");
+  });
+
+  it("preserves non-sibyl content in .gitignore", async () => {
+    const skillsDir = join(root, ".claude/skills");
+    await mkdir(skillsDir, { recursive: true });
+    await writeFile(join(skillsDir, ".gitignore"), "# custom\nmanual-entry\n");
+
+    const storeDir = join(root, ".sibyl/store/acme/tools/abc123/skills/auto");
+    await mkdir(storeDir, { recursive: true });
+
+    await link(root, "skill", "auto", storeDir);
+
+    const gitignore = await readFile(join(skillsDir, ".gitignore"), "utf8");
+    expect(gitignore).toContain("# custom");
+    expect(gitignore).toContain("manual-entry");
+    expect(gitignore).toContain("# managed by sibyl");
+    expect(gitignore).toContain("auto");
+  });
+});
