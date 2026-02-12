@@ -18,6 +18,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  },
   "packageManager": "pnpm@10.12.2",
   "pnpm": {
     "onlyBuiltDependencies": ["@biomejs/biome", "esbuild"]
