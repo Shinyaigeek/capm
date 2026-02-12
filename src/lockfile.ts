@@ -2,7 +2,7 @@ import { mkdtemp, readFile, rename, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const LOCKFILE = "sibyl-lock.json";
+const LOCKFILE = "capm-lock.json";
 
 export type PackageType = "skill" | "agent" | "command";
 
@@ -44,7 +44,7 @@ export async function readLock(root: string): Promise<Lockfile> {
  */
 export async function writeLock(root: string, data: Lockfile): Promise<void> {
   const dest = lockfilePath(root);
-  const dir = await mkdtemp(join(tmpdir(), "sibyl-"));
+  const dir = await mkdtemp(join(tmpdir(), "capm-"));
   const tmp = join(dir, "lock.json");
   await writeFile(tmp, `${JSON.stringify(data, null, 2)}\n`, "utf8");
   await rename(tmp, dest);

@@ -8,7 +8,7 @@ import type { StoreLocation } from "../store.js";
 let root: string;
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "sibyl-test-"));
+  root = await mkdtemp(join(tmpdir(), "capm-test-"));
 });
 
 afterEach(async () => {
@@ -23,15 +23,15 @@ const loc: StoreLocation = {
 };
 
 describe("storeRoot", () => {
-  it("returns .sibyl/store under root", () => {
-    expect(storeRoot("/project")).toBe("/project/.sibyl/store");
+  it("returns .capm/store under root", () => {
+    expect(storeRoot("/project")).toBe("/project/.capm/store");
   });
 });
 
 describe("storePath", () => {
   it("builds full store path", () => {
     expect(storePath("/project", loc)).toBe(
-      "/project/.sibyl/store/acme/tools/abc12345/skills/lint-fix",
+      "/project/.capm/store/acme/tools/abc12345/skills/lint-fix",
     );
   });
 });
@@ -39,7 +39,7 @@ describe("storePath", () => {
 describe("placeInStore", () => {
   it("copies files from source into the store", async () => {
     // Create a fake source directory simulating a cloned repo
-    const srcDir = await mkdtemp(join(tmpdir(), "sibyl-src-"));
+    const srcDir = await mkdtemp(join(tmpdir(), "capm-src-"));
     const srcPath = join(srcDir, "skills/lint-fix");
     await mkdir(srcPath, { recursive: true });
     await writeFile(join(srcPath, "prompt.md"), "# Lint Fix\n");
@@ -53,8 +53,8 @@ describe("placeInStore", () => {
     await rm(srcDir, { recursive: true, force: true });
   });
 
-  it("creates .gitignore with .sibyl/ entry", async () => {
-    const srcDir = await mkdtemp(join(tmpdir(), "sibyl-src-"));
+  it("creates .gitignore with .capm/ entry", async () => {
+    const srcDir = await mkdtemp(join(tmpdir(), "capm-src-"));
     const srcPath = join(srcDir, "skills/lint-fix");
     await mkdir(srcPath, { recursive: true });
     await writeFile(join(srcPath, "file.txt"), "content");
@@ -62,16 +62,16 @@ describe("placeInStore", () => {
     await placeInStore(root, loc, srcDir);
 
     const gitignore = await readFile(join(root, ".gitignore"), "utf8");
-    expect(gitignore).toContain(".sibyl/");
+    expect(gitignore).toContain(".capm/");
 
     await rm(srcDir, { recursive: true, force: true });
   });
 
-  it("does not duplicate .sibyl/ in .gitignore", async () => {
-    // Pre-create .gitignore with .sibyl/
-    await writeFile(join(root, ".gitignore"), "node_modules\n.sibyl/\n");
+  it("does not duplicate .capm/ in .gitignore", async () => {
+    // Pre-create .gitignore with .capm/
+    await writeFile(join(root, ".gitignore"), "node_modules\n.capm/\n");
 
-    const srcDir = await mkdtemp(join(tmpdir(), "sibyl-src-"));
+    const srcDir = await mkdtemp(join(tmpdir(), "capm-src-"));
     const srcPath = join(srcDir, "skills/lint-fix");
     await mkdir(srcPath, { recursive: true });
     await writeFile(join(srcPath, "file.txt"), "content");
@@ -79,7 +79,7 @@ describe("placeInStore", () => {
     await placeInStore(root, loc, srcDir);
 
     const gitignore = await readFile(join(root, ".gitignore"), "utf8");
-    const count = gitignore.split(".sibyl/").length - 1;
+    const count = gitignore.split(".capm/").length - 1;
     expect(count).toBe(1);
 
     await rm(srcDir, { recursive: true, force: true });
@@ -89,7 +89,7 @@ describe("placeInStore", () => {
 describe("removeFromStore", () => {
   it("removes a stored package", async () => {
     // Place something first
-    const srcDir = await mkdtemp(join(tmpdir(), "sibyl-src-"));
+    const srcDir = await mkdtemp(join(tmpdir(), "capm-src-"));
     const srcPath = join(srcDir, "skills/lint-fix");
     await mkdir(srcPath, { recursive: true });
     await writeFile(join(srcPath, "file.txt"), "content");

@@ -7,7 +7,7 @@ import { link, unlinkPackage } from "../linker.js";
 let root: string;
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "sibyl-test-"));
+  root = await mkdtemp(join(tmpdir(), "capm-test-"));
 });
 
 afterEach(async () => {
@@ -17,7 +17,7 @@ afterEach(async () => {
 describe("link — skill (directory)", () => {
   it("creates a relative symlink for a skill directory", async () => {
     // Create a fake store path with contents
-    const storeDir = join(root, ".sibyl/store/acme/tools/abc123/skills/lint-fix");
+    const storeDir = join(root, ".capm/store/acme/tools/abc123/skills/lint-fix");
     await mkdir(storeDir, { recursive: true });
     await writeFile(join(storeDir, "prompt.md"), "# Lint Fix");
 
@@ -36,8 +36,8 @@ describe("link — skill (directory)", () => {
   });
 
   it("replaces existing symlink", async () => {
-    const store1 = join(root, ".sibyl/store/acme/tools/aaa/skills/s");
-    const store2 = join(root, ".sibyl/store/acme/tools/bbb/skills/s");
+    const store1 = join(root, ".capm/store/acme/tools/aaa/skills/s");
+    const store2 = join(root, ".capm/store/acme/tools/bbb/skills/s");
     await mkdir(store1, { recursive: true });
     await mkdir(store2, { recursive: true });
     await writeFile(join(store1, "f.md"), "v1");
@@ -53,7 +53,7 @@ describe("link — skill (directory)", () => {
 
 describe("link — agent (md files)", () => {
   it("creates symlinks for .md files in a directory", async () => {
-    const storeDir = join(root, ".sibyl/store/acme/tools/abc123/agents/review");
+    const storeDir = join(root, ".capm/store/acme/tools/abc123/agents/review");
     await mkdir(storeDir, { recursive: true });
     await writeFile(join(storeDir, "review.md"), "# Review Agent");
     await writeFile(join(storeDir, "helper.md"), "# Helper");
@@ -69,8 +69,8 @@ describe("link — agent (md files)", () => {
 
   it("creates a single symlink with .md suffix when no md files found", async () => {
     // Store path is a file itself (e.g., path pointed to a .md file)
-    const storeFile = join(root, ".sibyl/store/acme/tools/abc123/agents/my-agent.md");
-    await mkdir(join(root, ".sibyl/store/acme/tools/abc123/agents"), { recursive: true });
+    const storeFile = join(root, ".capm/store/acme/tools/abc123/agents/my-agent.md");
+    await mkdir(join(root, ".capm/store/acme/tools/abc123/agents"), { recursive: true });
     await writeFile(storeFile, "# My Agent");
 
     await link(root, "agent", "my-agent", storeFile);
@@ -83,7 +83,7 @@ describe("link — agent (md files)", () => {
 
 describe("link — command", () => {
   it("creates symlinks for .md files in command directory", async () => {
-    const storeDir = join(root, ".sibyl/store/acme/tools/abc123/commands/deploy");
+    const storeDir = join(root, ".capm/store/acme/tools/abc123/commands/deploy");
     await mkdir(storeDir, { recursive: true });
     await writeFile(join(storeDir, "deploy.md"), "# Deploy");
 
@@ -96,7 +96,7 @@ describe("link — command", () => {
 
 describe("unlinkPackage", () => {
   it("removes a skill symlink", async () => {
-    const storeDir = join(root, ".sibyl/store/acme/tools/abc123/skills/lint-fix");
+    const storeDir = join(root, ".capm/store/acme/tools/abc123/skills/lint-fix");
     await mkdir(storeDir, { recursive: true });
     await writeFile(join(storeDir, "prompt.md"), "content");
 
@@ -111,7 +111,7 @@ describe("unlinkPackage", () => {
   });
 
   it("removes agent md symlinks", async () => {
-    const storeDir = join(root, ".sibyl/store/acme/tools/abc123/agents/review");
+    const storeDir = join(root, ".capm/store/acme/tools/abc123/agents/review");
     await mkdir(storeDir, { recursive: true });
     await writeFile(join(storeDir, "review.md"), "content");
 
@@ -128,20 +128,20 @@ describe("unlinkPackage", () => {
 
 describe("gitignore management", () => {
   it("creates .gitignore in .claude/skills/ when linking a skill", async () => {
-    const storeDir = join(root, ".sibyl/store/acme/tools/abc123/skills/lint-fix");
+    const storeDir = join(root, ".capm/store/acme/tools/abc123/skills/lint-fix");
     await mkdir(storeDir, { recursive: true });
     await writeFile(join(storeDir, "prompt.md"), "content");
 
     await link(root, "skill", "lint-fix", storeDir);
 
     const gitignore = await readFile(join(root, ".claude/skills/.gitignore"), "utf8");
-    expect(gitignore).toContain("# managed by sibyl");
+    expect(gitignore).toContain("# managed by capm");
     expect(gitignore).toContain("lint-fix");
   });
 
   it("adds multiple entries sorted", async () => {
-    const storeA = join(root, ".sibyl/store/acme/tools/abc123/skills/zzz");
-    const storeB = join(root, ".sibyl/store/acme/tools/abc123/skills/aaa");
+    const storeA = join(root, ".capm/store/acme/tools/abc123/skills/zzz");
+    const storeB = join(root, ".capm/store/acme/tools/abc123/skills/aaa");
     await mkdir(storeA, { recursive: true });
     await mkdir(storeB, { recursive: true });
 
@@ -150,14 +150,14 @@ describe("gitignore management", () => {
 
     const gitignore = await readFile(join(root, ".claude/skills/.gitignore"), "utf8");
     const lines = gitignore.split("\n");
-    const headerIdx = lines.findIndex((l) => l.includes("managed by sibyl"));
+    const headerIdx = lines.findIndex((l) => l.includes("managed by capm"));
     expect(lines[headerIdx + 1]).toBe("aaa");
     expect(lines[headerIdx + 2]).toBe("zzz");
   });
 
   it("removes entry from .gitignore on unlink", async () => {
-    const storeA = join(root, ".sibyl/store/acme/tools/abc123/skills/a");
-    const storeB = join(root, ".sibyl/store/acme/tools/abc123/skills/b");
+    const storeA = join(root, ".capm/store/acme/tools/abc123/skills/a");
+    const storeB = join(root, ".capm/store/acme/tools/abc123/skills/b");
     await mkdir(storeA, { recursive: true });
     await mkdir(storeB, { recursive: true });
 
@@ -171,7 +171,7 @@ describe("gitignore management", () => {
   });
 
   it("removes .gitignore when last entry is unlinked", async () => {
-    const storeDir = join(root, ".sibyl/store/acme/tools/abc123/skills/only");
+    const storeDir = join(root, ".capm/store/acme/tools/abc123/skills/only");
     await mkdir(storeDir, { recursive: true });
 
     await link(root, "skill", "only", storeDir);
@@ -181,7 +181,7 @@ describe("gitignore management", () => {
   });
 
   it("adds .md filenames for agent/command", async () => {
-    const storeDir = join(root, ".sibyl/store/acme/tools/abc123/agents/review");
+    const storeDir = join(root, ".capm/store/acme/tools/abc123/agents/review");
     await mkdir(storeDir, { recursive: true });
     await writeFile(join(storeDir, "review.md"), "content");
 
@@ -191,12 +191,12 @@ describe("gitignore management", () => {
     expect(gitignore).toContain("review.md");
   });
 
-  it("preserves non-sibyl content in .gitignore", async () => {
+  it("preserves non-capm content in .gitignore", async () => {
     const skillsDir = join(root, ".claude/skills");
     await mkdir(skillsDir, { recursive: true });
     await writeFile(join(skillsDir, ".gitignore"), "# custom\nmanual-entry\n");
 
-    const storeDir = join(root, ".sibyl/store/acme/tools/abc123/skills/auto");
+    const storeDir = join(root, ".capm/store/acme/tools/abc123/skills/auto");
     await mkdir(storeDir, { recursive: true });
 
     await link(root, "skill", "auto", storeDir);
@@ -204,7 +204,7 @@ describe("gitignore management", () => {
     const gitignore = await readFile(join(skillsDir, ".gitignore"), "utf8");
     expect(gitignore).toContain("# custom");
     expect(gitignore).toContain("manual-entry");
-    expect(gitignore).toContain("# managed by sibyl");
+    expect(gitignore).toContain("# managed by capm");
     expect(gitignore).toContain("auto");
   });
 });

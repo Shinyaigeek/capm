@@ -9,7 +9,7 @@ import { list } from "../list.js";
 let root: string;
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "sibyl-test-"));
+  root = await mkdtemp(join(tmpdir(), "capm-test-"));
 });
 
 afterEach(async () => {

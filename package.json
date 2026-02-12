@@ -1,10 +1,10 @@
 {
-  "name": "sibyl",
+  "name": "capm",
   "version": "0.0.1",
   "description": "Claude Code package manager for skills, agents, and commands",
   "type": "module",
   "bin": {
-    "sibyl": "./dist/bin/sibyl.js"
+    "capm": "./dist/bin/capm.js"
   },
   "scripts": {
     "build": "tsc",

@@ -1,7 +1,7 @@
 import { appendFile, cp, mkdir, readFile, rm, stat } from "node:fs/promises";
 import { join } from "node:path";
 
-const SIBYL_DIR = ".sibyl";
+const CAPM_DIR = ".capm";
 const STORE_DIR = "store";
 
 export interface StoreLocation {
@@ -12,15 +12,15 @@ export interface StoreLocation {
 }
 
 /**
- * Get the store root: <projectRoot>/.sibyl/store
+ * Get the store root: <projectRoot>/.capm/store
  */
 export function storeRoot(root: string): string {
-  return join(root, SIBYL_DIR, STORE_DIR);
+  return join(root, CAPM_DIR, STORE_DIR);
 }
 
 /**
  * Build the store path for a specific package version:
- *   .sibyl/store/<org>/<repo>/<commit>/<path>
+ *   .capm/store/<org>/<repo>/<commit>/<path>
  */
 export function storePath(root: string, loc: StoreLocation): string {
   return join(storeRoot(root), loc.org, loc.repo, loc.commit, loc.path);
@@ -67,7 +67,7 @@ export async function existsInStore(root: string, loc: StoreLocation): Promise<b
 }
 
 /**
- * Ensure .sibyl/ is in .gitignore.
+ * Ensure .capm/ is in .gitignore.
  */
 async function ensureGitignore(root: string): Promise<void> {
   const gitignorePath = join(root, ".gitignore");
@@ -79,10 +79,10 @@ async function ensureGitignore(root: string): Promise<void> {
   }
 
   const lines = content.split("\n");
-  if (lines.some((line) => line.trim() === ".sibyl/" || line.trim() === ".sibyl")) {
+  if (lines.some((line) => line.trim() === ".capm/" || line.trim() === ".capm")) {
     return;
   }
 
-  const entry = content.length > 0 && !content.endsWith("\n") ? "\n.sibyl/\n" : ".sibyl/\n";
+  const entry = content.length > 0 && !content.endsWith("\n") ? "\n.capm/\n" : ".capm/\n";
   await appendFile(gitignorePath, entry);
 }

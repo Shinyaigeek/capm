@@ -23,7 +23,7 @@ function cloneUrl(org: string, repo: string): string {
  * Returns { tmpDir, commit }.
  */
 export async function shallowClone(org: string, repo: string, ref = "main"): Promise<CloneResult> {
-  const tmpDir = await mkdtemp(join(tmpdir(), "sibyl-clone-"));
+  const tmpDir = await mkdtemp(join(tmpdir(), "capm-clone-"));
   const url = cloneUrl(org, repo);
 
   await execFileAsync(
@@ -45,7 +45,7 @@ export async function cloneAtCommit(
   repo: string,
   commit: string,
 ): Promise<CloneResult> {
-  const tmpDir = await mkdtemp(join(tmpdir(), "sibyl-clone-"));
+  const tmpDir = await mkdtemp(join(tmpdir(), "capm-clone-"));
   const url = cloneUrl(org, repo);
 
   await execFileAsync("git", ["init", tmpDir], { timeout: 10_000 });

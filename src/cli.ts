@@ -11,17 +11,17 @@ export function createCli(): Command {
 
   const program = new Command();
   program
-    .name("sibyl")
+    .name("capm")
     .description("Claude Code package manager for skills, agents, and commands")
     .version("0.0.1");
 
-  // sibyl i — restore from lockfile
+  // capm i — restore from lockfile
   program
     .command("i")
-    .description("Restore all packages from sibyl-lock.json")
+    .description("Restore all packages from capm-lock.json")
     .action(() => restore(root));
 
-  // sibyl update [filter] — update all packages (or filtered by org/repo)
+  // capm update [filter] — update all packages (or filtered by org/repo)
   program
     .command("update [filter]")
     .description("Update all packages (or filter by <org>/<repo>)")

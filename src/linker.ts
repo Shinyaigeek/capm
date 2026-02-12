@@ -140,10 +140,10 @@ async function safeUnlink(p: string): Promise<void> {
   }
 }
 
-const GITIGNORE_HEADER = "# managed by sibyl";
+const GITIGNORE_HEADER = "# managed by capm";
 
 /**
- * Read the sibyl-managed section from a .gitignore in the given directory.
+ * Read the capm-managed section from a .gitignore in the given directory.
  * Returns the full content and the set of managed entries.
  */
 async function readGitignoreEntries(
@@ -177,7 +177,7 @@ async function readGitignoreEntries(
 }
 
 /**
- * Write the .gitignore file, replacing the sibyl-managed section.
+ * Write the .gitignore file, replacing the capm-managed section.
  * If there are no managed entries, remove the section entirely.
  */
 async function writeGitignore(
@@ -185,7 +185,7 @@ async function writeGitignore(
   fullContent: string,
   managed: Set<string>,
 ): Promise<void> {
-  // Strip existing sibyl section from content
+  // Strip existing capm section from content
   const lines = fullContent.split("\n");
   const cleaned: string[] = [];
   let inSection = false;
@@ -232,7 +232,7 @@ async function writeGitignore(
 }
 
 /**
- * Add entries to the sibyl-managed .gitignore in the given directory.
+ * Add entries to the capm-managed .gitignore in the given directory.
  */
 async function addToGitignore(dir: string, names: string[]): Promise<void> {
   const { content, managed } = await readGitignoreEntries(dir);
@@ -249,7 +249,7 @@ async function addToGitignore(dir: string, names: string[]): Promise<void> {
 }
 
 /**
- * Remove entries from the sibyl-managed .gitignore in the given directory.
+ * Remove entries from the capm-managed .gitignore in the given directory.
  */
 async function removeFromGitignore(dir: string, names: string[]): Promise<void> {
   const { content, managed } = await readGitignoreEntries(dir);

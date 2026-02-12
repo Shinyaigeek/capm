@@ -24,8 +24,8 @@ let root: string;
 
 beforeEach(async () => {
   vi.clearAllMocks();
-  root = await mkdtemp(join(tmpdir(), "sibyl-test-"));
-  mockSrcDir = await mkdtemp(join(tmpdir(), "sibyl-src-"));
+  root = await mkdtemp(join(tmpdir(), "capm-test-"));
+  mockSrcDir = await mkdtemp(join(tmpdir(), "capm-src-"));
 });
 
 afterEach(async () => {

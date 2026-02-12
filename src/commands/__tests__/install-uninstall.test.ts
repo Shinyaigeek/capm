@@ -32,8 +32,8 @@ let root: string;
 let srcDir: string;
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "sibyl-test-"));
-  srcDir = await mkdtemp(join(tmpdir(), "sibyl-src-"));
+  root = await mkdtemp(join(tmpdir(), "capm-test-"));
+  srcDir = await mkdtemp(join(tmpdir(), "capm-src-"));
 
   // Create fake repo content
   await mkdir(join(srcDir, "skills/lint-fix"), { recursive: true });
@@ -60,7 +60,7 @@ describe("install", () => {
     await install("skill", "acme/tools/skills/lint-fix", root);
 
     // Check lockfile
-    const lock = JSON.parse(await readFile(join(root, "sibyl-lock.json"), "utf8"));
+    const lock = JSON.parse(await readFile(join(root, "capm-lock.json"), "utf8"));
     const entry = lock.packages["acme/tools/skills/lint-fix"];
     expect(entry).toBeDefined();
     expect(entry.type).toBe("skill");
@@ -75,7 +75,7 @@ describe("install", () => {
   it("installs an agent and symlinks md files", async () => {
     await install("agent", "acme/tools/agents/reviewer", root);
 
-    const lock = JSON.parse(await readFile(join(root, "sibyl-lock.json"), "utf8"));
+    const lock = JSON.parse(await readFile(join(root, "capm-lock.json"), "utf8"));
     expect(lock.packages["acme/tools/agents/reviewer"].type).toBe("agent");
 
     const content = await readFile(join(root, ".claude/agents/reviewer.md"), "utf8");
@@ -85,18 +85,18 @@ describe("install", () => {
   it("installs a command and symlinks md files", async () => {
     await install("command", "acme/tools/commands/deploy", root);
 
-    const lock = JSON.parse(await readFile(join(root, "sibyl-lock.json"), "utf8"));
+    const lock = JSON.parse(await readFile(join(root, "capm-lock.json"), "utf8"));
     expect(lock.packages["acme/tools/commands/deploy"].type).toBe("command");
 
     const content = await readFile(join(root, ".claude/commands/deploy.md"), "utf8");
     expect(content).toBe("# Deploy Command");
   });
 
-  it("creates .gitignore with .sibyl/ entry", async () => {
+  it("creates .gitignore with .capm/ entry", async () => {
     await install("skill", "acme/tools/skills/lint-fix", root);
 
     const gitignore = await readFile(join(root, ".gitignore"), "utf8");
-    expect(gitignore).toContain(".sibyl/");
+    expect(gitignore).toContain(".capm/");
   });
 });
 
@@ -113,7 +113,7 @@ describe("uninstall", () => {
     await expect(lstat(join(root, ".claude/skills/lint-fix"))).rejects.toThrow();
 
     // Lockfile entry removed
-    const lock = JSON.parse(await readFile(join(root, "sibyl-lock.json"), "utf8"));
+    const lock = JSON.parse(await readFile(join(root, "capm-lock.json"), "utf8"));
     expect(lock.packages["acme/tools/skills/lint-fix"]).toBeUndefined();
   });
 

@@ -12,8 +12,8 @@ let commitSha: string;
 
 beforeEach(async () => {
   // Create a local bare repo to clone from (avoids network)
-  bareRepo = await mkdtemp(join(tmpdir(), "sibyl-bare-"));
-  const workDir = await mkdtemp(join(tmpdir(), "sibyl-work-"));
+  bareRepo = await mkdtemp(join(tmpdir(), "capm-bare-"));
+  const workDir = await mkdtemp(join(tmpdir(), "capm-work-"));
 
   await execFileAsync("git", ["init", "-b", "main", workDir]);
   await execFileAsync("git", ["-C", workDir, "config", "user.email", "test@test.com"]);
@@ -51,7 +51,7 @@ describe("shallowClone", () => {
     const { promisify: p } = await import("node:util");
     const exec = p(ef);
 
-    const tmpDir = await mkdtemp(join(tmpdir(), "sibyl-clone-test-"));
+    const tmpDir = await mkdtemp(join(tmpdir(), "capm-clone-test-"));
     await exec("git", [
       "clone",
       "--depth",
@@ -72,7 +72,7 @@ describe("shallowClone", () => {
 
 describe("cloneAtCommit", () => {
   it("clones at a specific commit using local bare repo", async () => {
-    const tmpDir = await mkdtemp(join(tmpdir(), "sibyl-clone-test-"));
+    const tmpDir = await mkdtemp(join(tmpdir(), "capm-clone-test-"));
 
     await execFileAsync("git", ["init", tmpDir]);
     await execFileAsync("git", ["-C", tmpDir, "remote", "add", "origin", bareRepo]);

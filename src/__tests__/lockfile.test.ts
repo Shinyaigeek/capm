@@ -8,7 +8,7 @@ import type { LockEntry, Lockfile } from "../lockfile.js";
 let root: string;
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "sibyl-test-"));
+  root = await mkdtemp(join(tmpdir(), "capm-test-"));
 });
 
 afterEach(async () => {
@@ -43,7 +43,7 @@ describe("writeLock", () => {
   it("writes lockfile with pretty JSON", async () => {
     const data: Lockfile = { packages: { "x/y/z": entry } };
     await writeLock(root, data);
-    const raw = await readFile(join(root, "sibyl-lock.json"), "utf8");
+    const raw = await readFile(join(root, "capm-lock.json"), "utf8");
     expect(raw).toBe(`${JSON.stringify(data, null, 2)}\n`);
   });
 

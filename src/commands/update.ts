@@ -65,10 +65,10 @@ function matchEntries(
 /**
  * Update packages to the latest commit on their tracked ref.
  *
- * - `sibyl update` — update all packages
- * - `sibyl skill update` — update all skills
- * - `sibyl skill update org/repo` — update all skills from that repo
- * - `sibyl skill update org/repo/path` — update a specific package
+ * - `capm update` — update all packages
+ * - `capm skill update` — update all skills
+ * - `capm skill update org/repo` — update all skills from that repo
+ * - `capm skill update org/repo/path` — update a specific package
  */
 export async function update(
   type: PackageType | undefined,

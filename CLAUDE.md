@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Sibyl is a CLI package manager for Claude Code skills, agents, and commands. It installs packages from GitHub repositories by cloning, storing locally in `.sibyl/store/`, and symlinking into `.claude/` directories.
+capm is a CLI package manager for Claude Code skills, agents, and commands. It installs packages from GitHub repositories by cloning, storing locally in `.capm/store/`, and symlinking into `.claude/` directories.
 
 ## Commands
 
@@ -32,9 +32,9 @@ Three types with different linking behavior:
 ### Pipeline: install → store → link → lock
 
 1. **git.ts** — shallow-clones a GitHub repo at a ref or commit
-2. **store.ts** — copies the relevant path into `.sibyl/store/<org>/<repo>/<commit>/<path>/`
-3. **linker.ts** — creates relative symlinks from `.claude/<type>/` to the store; manages `.gitignore` entries in a "managed by sibyl" section
-4. **lockfile.ts** — records the install in `sibyl-lock.json` (atomic writes via temp-file + rename)
+2. **store.ts** — copies the relevant path into `.capm/store/<org>/<repo>/<commit>/<path>/`
+3. **linker.ts** — creates relative symlinks from `.claude/<type>/` to the store; manages `.gitignore` entries in a "managed by capm" section
+4. **lockfile.ts** — records the install in `capm-lock.json` (atomic writes via temp-file + rename)
 
 ### CLI Structure (`src/cli.ts`)
 
