@@ -1,9 +1,19 @@
 import { rm } from "node:fs/promises";
 import { shallowClone } from "../git.js";
 import { link } from "../linker.js";
-import { addEntry } from "../lockfile.js";
+import { addEntry, readLock } from "../lockfile.js";
 import type { PackageType } from "../lockfile.js";
-import { SYMBOLS, commitHash, dim, green, pkgName, specRef, spinner, typeBadge } from "../log.js";
+import {
+  SYMBOLS,
+  commitHash,
+  dim,
+  green,
+  pkgName,
+  specRef,
+  spinner,
+  typeBadge,
+  warn,
+} from "../log.js";
 import { nameFromSpec, parseSpec, specKey } from "../spec.js";
 import { placeInStore } from "../store.js";
 
@@ -14,6 +24,16 @@ export async function install(type: PackageType, raw: string, root: string): Pro
   const spec = parseSpec(raw);
   const name = nameFromSpec(spec);
   const key = specKey(spec);
+
+  // Check if already installed
+  const lock = await readLock(root);
+  const existing = lock.packages[key];
+  if (existing && existing.ref === spec.ref) {
+    warn(
+      `${typeBadge(type)} ${pkgName(name)} is already installed ${commitHash(existing.commit)}  ${specRef(key, spec.ref)}`,
+    );
+    return;
+  }
 
   const s = spinner(`Cloning ${dim(`${spec.org}/${spec.repo}`)}${dim("@")}${spec.ref}`);
 
