@@ -1,15 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import {
-  mkdtemp,
-  rm,
-  mkdir,
-  writeFile,
-  readlink,
-  lstat,
-  readFile,
-} from "node:fs/promises";
-import { join, relative } from "node:path";
+import { lstat, mkdir, mkdtemp, readFile, readlink, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
+import { join, relative } from "node:path";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { link, unlinkPackage } from "../linker.js";
 
 let root: string;
@@ -36,9 +28,7 @@ describe("link — skill (directory)", () => {
 
     // Symlink should be relative
     expect(linkTarget).not.toMatch(/^\//);
-    expect(linkTarget).toBe(
-      relative(join(root, ".claude/skills"), storeDir),
-    );
+    expect(linkTarget).toBe(relative(join(root, ".claude/skills"), storeDir));
 
     // Should be able to read through the symlink
     const content = await readFile(join(linkPath, "prompt.md"), "utf8");
@@ -132,8 +122,6 @@ describe("unlinkPackage", () => {
   });
 
   it("does not throw when symlink does not exist", async () => {
-    await expect(
-      unlinkPackage(root, "skill", "nonexistent", "/fake/path"),
-    ).resolves.not.toThrow();
+    await expect(unlinkPackage(root, "skill", "nonexistent", "/fake/path")).resolves.not.toThrow();
   });
 });

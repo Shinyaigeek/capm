@@ -1,9 +1,9 @@
 import { rm } from "node:fs/promises";
+import { cloneAtCommit, shallowClone } from "../git.js";
+import { link } from "../linker.js";
 import { readLock } from "../lockfile.js";
 import type { LockEntry } from "../lockfile.js";
-import { placeInStore, existsInStore, storePath } from "../store.js";
-import { link } from "../linker.js";
-import { shallowClone, cloneAtCommit } from "../git.js";
+import { existsInStore, placeInStore, storePath } from "../store.js";
 
 interface GroupItem extends LockEntry {
   key: string;
@@ -45,7 +45,7 @@ export async function restore(root: string): Promise<void> {
         items: [],
       });
     }
-    groups.get(groupKey)!.items.push({ key, ...entry });
+    groups.get(groupKey)?.items.push({ key, ...entry });
   }
 
   for (const group of groups.values()) {
@@ -66,11 +66,7 @@ export async function restore(root: string): Promise<void> {
 
     if (needsClone.length > 0) {
       try {
-        const result = await cloneAtCommit(
-          group.org,
-          group.repo,
-          group.commit,
-        );
+        const result = await cloneAtCommit(group.org, group.repo, group.commit);
         tmpDir = result.tmpDir;
       } catch {
         console.log(

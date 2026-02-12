@@ -30,9 +30,7 @@ export function parseSpec(raw: string): Spec {
 
   const parts = body.split("/");
   if (parts.length < 3) {
-    throw new Error(
-      `Invalid spec "${raw}": expected <org>/<repo>/<path> (at least 3 segments)`,
-    );
+    throw new Error(`Invalid spec "${raw}": expected <org>/<repo>/<path> (at least 3 segments)`);
   }
 
   const org = parts[0];
@@ -52,7 +50,8 @@ export function parseSpec(raw: string): Spec {
  *   "acme/tools/agents/my-agent.md" → "my-agent"
  */
 export function nameFromSpec(spec: Spec): string {
-  const last = spec.path.split("/").pop()!;
+  const segments = spec.path.split("/");
+  const last = segments[segments.length - 1];
   return last.replace(/\.md$/, "");
 }
 

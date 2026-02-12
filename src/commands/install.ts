@@ -1,19 +1,15 @@
 import { rm } from "node:fs/promises";
-import { parseSpec, nameFromSpec, specKey } from "../spec.js";
 import { shallowClone } from "../git.js";
-import { placeInStore } from "../store.js";
-import { addEntry } from "../lockfile.js";
 import { link } from "../linker.js";
+import { addEntry } from "../lockfile.js";
 import type { PackageType } from "../lockfile.js";
+import { nameFromSpec, parseSpec, specKey } from "../spec.js";
+import { placeInStore } from "../store.js";
 
 /**
  * Install a skill/agent/command from a GitHub spec.
  */
-export async function install(
-  type: PackageType,
-  raw: string,
-  root: string,
-): Promise<void> {
+export async function install(type: PackageType, raw: string, root: string): Promise<void> {
   const spec = parseSpec(raw);
   const name = nameFromSpec(spec);
   const key = specKey(spec);

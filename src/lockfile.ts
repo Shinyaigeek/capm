@@ -1,6 +1,6 @@
-import { readFile, writeFile, rename, mkdtemp } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdtemp, readFile, rename, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const LOCKFILE = "sibyl-lock.json";
 
@@ -46,7 +46,7 @@ export async function writeLock(root: string, data: Lockfile): Promise<void> {
   const dest = lockfilePath(root);
   const dir = await mkdtemp(join(tmpdir(), "sibyl-"));
   const tmp = join(dir, "lock.json");
-  await writeFile(tmp, JSON.stringify(data, null, 2) + "\n", "utf8");
+  await writeFile(tmp, `${JSON.stringify(data, null, 2)}\n`, "utf8");
   await rename(tmp, dest);
 }
 
@@ -57,10 +57,7 @@ export interface AddEntryInput extends LockEntry {
 /**
  * Add or update a package entry in the lockfile.
  */
-export async function addEntry(
-  root: string,
-  entry: AddEntryInput,
-): Promise<Lockfile> {
+export async function addEntry(root: string, entry: AddEntryInput): Promise<Lockfile> {
   const lock = await readLock(root);
   lock.packages[entry.key] = {
     type: entry.type,
@@ -78,10 +75,7 @@ export async function addEntry(
 /**
  * Remove a package entry by key.
  */
-export async function removeEntry(
-  root: string,
-  key: string,
-): Promise<Lockfile> {
+export async function removeEntry(root: string, key: string): Promise<Lockfile> {
   const lock = await readLock(root);
   delete lock.packages[key];
   await writeLock(root, lock);

@@ -1,13 +1,10 @@
-import { readLock, findEntries } from "../lockfile.js";
+import { findEntries, readLock } from "../lockfile.js";
 import type { PackageType } from "../lockfile.js";
 
 /**
  * List installed packages, optionally filtered by type.
  */
-export async function list(
-  type: PackageType | undefined,
-  root: string,
-): Promise<void> {
+export async function list(type: PackageType | undefined, root: string): Promise<void> {
   const lock = await readLock(root);
   const entries = findEntries(lock, type ? { type } : {});
 

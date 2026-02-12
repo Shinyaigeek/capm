@@ -1,8 +1,8 @@
 import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import { mkdtemp } from "node:fs/promises";
-import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 
@@ -22,11 +22,7 @@ function cloneUrl(org: string, repo: string): string {
  * Shallow-clone a repo at a specific ref into a temp directory.
  * Returns { tmpDir, commit }.
  */
-export async function shallowClone(
-  org: string,
-  repo: string,
-  ref: string = "main",
-): Promise<CloneResult> {
+export async function shallowClone(org: string, repo: string, ref = "main"): Promise<CloneResult> {
   const tmpDir = await mkdtemp(join(tmpdir(), "sibyl-clone-"));
   const url = cloneUrl(org, repo);
 
@@ -56,11 +52,9 @@ export async function cloneAtCommit(
   await execFileAsync("git", ["-C", tmpDir, "remote", "add", "origin", url], {
     timeout: 10_000,
   });
-  await execFileAsync(
-    "git",
-    ["-C", tmpDir, "fetch", "--depth", "1", "origin", commit],
-    { timeout: 60_000 },
-  );
+  await execFileAsync("git", ["-C", tmpDir, "fetch", "--depth", "1", "origin", commit], {
+    timeout: 60_000,
+  });
   await execFileAsync("git", ["-C", tmpDir, "checkout", "FETCH_HEAD"], {
     timeout: 10_000,
   });
@@ -72,10 +66,8 @@ export async function cloneAtCommit(
  * Get the HEAD commit SHA of a cloned repo.
  */
 async function resolveCommit(repoDir: string): Promise<string> {
-  const { stdout } = await execFileAsync(
-    "git",
-    ["-C", repoDir, "rev-parse", "HEAD"],
-    { timeout: 10_000 },
-  );
+  const { stdout } = await execFileAsync("git", ["-C", repoDir, "rev-parse", "HEAD"], {
+    timeout: 10_000,
+  });
   return stdout.trim();
 }

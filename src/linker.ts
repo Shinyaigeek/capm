@@ -1,12 +1,5 @@
-import {
-  symlink,
-  unlink,
-  mkdir,
-  readdir,
-  stat,
-  lstat,
-} from "node:fs/promises";
-import { join, relative, dirname } from "node:path";
+import { lstat, mkdir, readdir, stat, symlink, unlink } from "node:fs/promises";
+import { dirname, join, relative } from "node:path";
 import type { PackageType } from "./lockfile.js";
 
 const TYPE_DIRS: Record<PackageType, string> = {
@@ -46,7 +39,7 @@ export async function link(
     const mdFiles = await findMdFiles(storePathAbs);
     if (mdFiles.length === 0) {
       // The store path itself may be a single .md file
-      const linkPath = join(targetDir, name + ".md");
+      const linkPath = join(targetDir, `${name}.md`);
       await forceSymlink(storePathAbs, linkPath);
     } else {
       for (const mdFile of mdFiles) {
@@ -79,7 +72,7 @@ export async function unlinkPackage(
       // store path may already be removed
     }
     if (mdFiles.length === 0) {
-      await safeUnlink(join(targetDir, name + ".md"));
+      await safeUnlink(join(targetDir, `${name}.md`));
     } else {
       for (const mdFile of mdFiles) {
         await safeUnlink(join(targetDir, mdFile));

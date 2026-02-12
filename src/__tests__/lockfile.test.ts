@@ -1,15 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtemp, rm, readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import {
-  readLock,
-  writeLock,
-  addEntry,
-  removeEntry,
-  findEntries,
-} from "../lockfile.js";
-import type { Lockfile, LockEntry } from "../lockfile.js";
+import { join } from "node:path";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { addEntry, findEntries, readLock, removeEntry, writeLock } from "../lockfile.js";
+import type { LockEntry, Lockfile } from "../lockfile.js";
 
 let root: string;
 
@@ -50,7 +44,7 @@ describe("writeLock", () => {
     const data: Lockfile = { packages: { "x/y/z": entry } };
     await writeLock(root, data);
     const raw = await readFile(join(root, "sibyl-lock.json"), "utf8");
-    expect(raw).toBe(JSON.stringify(data, null, 2) + "\n");
+    expect(raw).toBe(`${JSON.stringify(data, null, 2)}\n`);
   });
 
   it("overwrites existing lockfile", async () => {
@@ -72,7 +66,7 @@ describe("addEntry", () => {
     await addEntry(root, { key: "k", ...entry });
     const updated = { ...entry, commit: "newcommit1234" };
     const lock = await addEntry(root, { key: "k", ...updated });
-    expect(lock.packages["k"].commit).toBe("newcommit1234");
+    expect(lock.packages.k.commit).toBe("newcommit1234");
   });
 
   it("preserves other entries", async () => {

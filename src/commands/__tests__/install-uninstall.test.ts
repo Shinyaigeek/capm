@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { mkdtemp, rm, readFile, lstat, mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { lstat, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock git.ts to avoid network calls
 vi.mock("../../git.js", () => {
@@ -25,7 +25,8 @@ vi.mock("../../git.js", () => {
 // Import after mock setup
 const { install } = await import("../install.js");
 const { uninstall } = await import("../uninstall.js");
-const { setMockSrcDir } = await import("../../git.js") as any;
+// biome-ignore lint/suspicious/noExplicitAny: mock module augmentation
+const { setMockSrcDir } = (await import("../../git.js")) as any;
 
 let root: string;
 let srcDir: string;
@@ -77,10 +78,7 @@ describe("install", () => {
     const lock = JSON.parse(await readFile(join(root, "sibyl-lock.json"), "utf8"));
     expect(lock.packages["acme/tools/agents/reviewer"].type).toBe("agent");
 
-    const content = await readFile(
-      join(root, ".claude/agents/reviewer.md"),
-      "utf8",
-    );
+    const content = await readFile(join(root, ".claude/agents/reviewer.md"), "utf8");
     expect(content).toBe("# Reviewer Agent");
   });
 
@@ -90,10 +88,7 @@ describe("install", () => {
     const lock = JSON.parse(await readFile(join(root, "sibyl-lock.json"), "utf8"));
     expect(lock.packages["acme/tools/commands/deploy"].type).toBe("command");
 
-    const content = await readFile(
-      join(root, ".claude/commands/deploy.md"),
-      "utf8",
-    );
+    const content = await readFile(join(root, ".claude/commands/deploy.md"), "utf8");
     expect(content).toBe("# Deploy Command");
   });
 
@@ -110,9 +105,7 @@ describe("uninstall", () => {
     await install("skill", "acme/tools/skills/lint-fix", root);
 
     // Verify installed
-    expect(
-      (await lstat(join(root, ".claude/skills/lint-fix"))).isSymbolicLink(),
-    ).toBe(true);
+    expect((await lstat(join(root, ".claude/skills/lint-fix"))).isSymbolicLink()).toBe(true);
 
     await uninstall("skill", "lint-fix", root);
 

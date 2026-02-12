@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { parseSpec, nameFromSpec, specKey } from "../spec.js";
+import { describe, expect, it } from "vitest";
+import { nameFromSpec, parseSpec, specKey } from "../spec.js";
 
 describe("parseSpec", () => {
   it("parses org/repo/path with default ref", () => {

@@ -1,10 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
-import { join } from "node:path";
-import { tmpdir } from "node:os";
 import { execFile } from "node:child_process";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { promisify } from "node:util";
-import { shallowClone, cloneAtCommit } from "../git.js";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 const execFileAsync = promisify(execFile);
 
@@ -76,31 +75,11 @@ describe("cloneAtCommit", () => {
     const tmpDir = await mkdtemp(join(tmpdir(), "sibyl-clone-test-"));
 
     await execFileAsync("git", ["init", tmpDir]);
-    await execFileAsync("git", [
-      "-C",
-      tmpDir,
-      "remote",
-      "add",
-      "origin",
-      bareRepo,
-    ]);
-    await execFileAsync("git", [
-      "-C",
-      tmpDir,
-      "fetch",
-      "--depth",
-      "1",
-      "origin",
-      commitSha,
-    ]);
+    await execFileAsync("git", ["-C", tmpDir, "remote", "add", "origin", bareRepo]);
+    await execFileAsync("git", ["-C", tmpDir, "fetch", "--depth", "1", "origin", commitSha]);
     await execFileAsync("git", ["-C", tmpDir, "checkout", "FETCH_HEAD"]);
 
-    const { stdout } = await execFileAsync("git", [
-      "-C",
-      tmpDir,
-      "rev-parse",
-      "HEAD",
-    ]);
+    const { stdout } = await execFileAsync("git", ["-C", tmpDir, "rev-parse", "HEAD"]);
     expect(stdout.trim()).toBe(commitSha);
 
     await rm(tmpDir, { recursive: true, force: true });

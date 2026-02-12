@@ -1,16 +1,12 @@
-import { readLock, removeEntry, findEntries } from "../lockfile.js";
-import { removeFromStore, storePath } from "../store.js";
 import { unlinkPackage } from "../linker.js";
+import { findEntries, readLock, removeEntry } from "../lockfile.js";
 import type { PackageType } from "../lockfile.js";
+import { removeFromStore, storePath } from "../store.js";
 
 /**
  * Uninstall a skill/agent/command by name.
  */
-export async function uninstall(
-  type: PackageType,
-  name: string,
-  root: string,
-): Promise<void> {
+export async function uninstall(type: PackageType, name: string, root: string): Promise<void> {
   const lock = await readLock(root);
   const matches = findEntries(lock, { type, name });
 

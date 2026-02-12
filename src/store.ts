@@ -1,4 +1,4 @@
-import { cp, mkdir, readFile, appendFile, rm, stat } from "node:fs/promises";
+import { appendFile, cp, mkdir, readFile, rm, stat } from "node:fs/promises";
 import { join } from "node:path";
 
 const SIBYL_DIR = ".sibyl";
@@ -49,10 +49,7 @@ export async function placeInStore(
 /**
  * Remove a package from the store.
  */
-export async function removeFromStore(
-  root: string,
-  loc: StoreLocation,
-): Promise<void> {
+export async function removeFromStore(root: string, loc: StoreLocation): Promise<void> {
   const dest = storePath(root, loc);
   await rm(dest, { recursive: true, force: true });
 }
@@ -60,10 +57,7 @@ export async function removeFromStore(
 /**
  * Check if a store path exists.
  */
-export async function existsInStore(
-  root: string,
-  loc: StoreLocation,
-): Promise<boolean> {
+export async function existsInStore(root: string, loc: StoreLocation): Promise<boolean> {
   try {
     await stat(storePath(root, loc));
     return true;
@@ -85,15 +79,10 @@ async function ensureGitignore(root: string): Promise<void> {
   }
 
   const lines = content.split("\n");
-  if (
-    lines.some((line) => line.trim() === ".sibyl/" || line.trim() === ".sibyl")
-  ) {
+  if (lines.some((line) => line.trim() === ".sibyl/" || line.trim() === ".sibyl")) {
     return;
   }
 
-  const entry =
-    content.length > 0 && !content.endsWith("\n")
-      ? "\n.sibyl/\n"
-      : ".sibyl/\n";
+  const entry = content.length > 0 && !content.endsWith("\n") ? "\n.sibyl/\n" : ".sibyl/\n";
   await appendFile(gitignorePath, entry);
 }

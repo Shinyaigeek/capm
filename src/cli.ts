@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { install } from "./commands/install.js";
-import { uninstall } from "./commands/uninstall.js";
 import { list } from "./commands/list.js";
 import { restore } from "./commands/restore.js";
+import { uninstall } from "./commands/uninstall.js";
 import type { PackageType } from "./lockfile.js";
 
 export function createCli(): Command {
