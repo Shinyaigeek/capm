@@ -18,6 +18,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Shinyaigeek/capm"
+  },
   "publishConfig": {
     "access": "public"
   },
