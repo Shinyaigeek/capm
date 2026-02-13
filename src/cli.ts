@@ -15,9 +15,10 @@ export function createCli(root?: string): Command {
     .description("Claude Code package manager for skills, agents, and commands")
     .version("0.0.1");
 
-  // capm i — restore from lockfile
+  // capm i / capm install — restore from lockfile
   program
     .command("i")
+    .alias("install")
     .description("Restore all packages from capm-lock.json")
     .action(() => restore(resolvedRoot));
 
@@ -33,6 +34,7 @@ export function createCli(root?: string): Command {
 
     cmd
       .command("i <spec>")
+      .alias("install")
       .description(`Install a ${type} from <org>/<repo>/<path>[@ref]`)
       .action((spec: string) => install(type, spec, resolvedRoot));
 
